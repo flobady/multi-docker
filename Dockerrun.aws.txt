@@ -1,0 +1,37 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+          "name": "client",
+          "image": "flobady/multi-client",
+          "hotsname": "client", // nom que l'on trouve dans le default.conf de nginx, permet aux autres services d'accéder à ce container. nginx n'a pas besoin de hostname par exemple car aucun container ne reach out to nginx
+          "essential": false // essentia true => si il crashe alors les autres doivent crasher. en vrai il y aque nginx qui est essential: si il crashe on ne veut pas pouvoir atteindre un autre container.
+        }
+    {
+      "name": "server",
+      "image": "flobady/multi-server",
+      "hostname": "api",
+      "essential": false,
+      "memory": // ram allouée à chaque contianer en megabytes
+    },
+    {
+      "name": "worker",
+      "image": "flobady/multi-worker",
+      "hostname": "worker",
+      "essential": false
+    },
+    {
+      "name": "nginx",
+      "image": "flobady/multi-nginx",
+      "hostname": "nginx",
+      "essential": true,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 80
+        }
+      ],
+      "links": ["client", "server"] // on dit que nginx est lié à client et server, c'est utile pour le routage des url /api et / pour avoir l'app react ou les appels api
+    }
+  ]
+}

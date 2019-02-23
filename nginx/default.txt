@@ -1,0 +1,12 @@
+upstream client { // il y a un serveur client localisé sur le port 3000
+  server client:3000;
+}
+
+
+location / {
+  rewrite /api/(.*) /$1 break; applique la regex: on vire le /api break sert à dire: nginx ne fais pas d'autre rewrite
+  proxy_pass http://client; => si on arrive sur "/" on route vers client
+}
+
+
+listen: 80; //dan sle container on écoute le port 80. sur le local il faudra mapper le port local à 80

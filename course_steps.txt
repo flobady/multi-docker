@@ -1,0 +1,98 @@
+
+todo:
+supprimer les .git
+linker au depo
+repousser
+checker travis
+
+finir vidéo sur nginx
+
+passer à kubernetes
+
+
+===== DEV =====
+1) dans le worker directory, exécuter "node index.js"
+=>  on veut un message qui dit on n'a pas toruvé redis
+
+2) cd client, execute: docker build -f Dockerfile.dev .
+docker run imageId
+
+=> ça doit marcher
+
+cd server => répéter 2)
+cd worker => répéter 2)
+
+3) depuis complex: docker compose up
+
+
+=== PROD ====
+4) crée depo github: nom: multi-docker
+linker depo à travis
+dans Travis, settings, environment variables DOCKER_ID, DOCKER_PASSWORD
+
+
+5) aws amazon, select service elastic beanstalk, create new application: multi-docker, create environment: web server, base configuration: preconfigured platfomr: docker multi container => create environment
+session 143: Naviguer vers la liste des VPC, choisir le VPC dans la région ou on a crée EB instance.
+sur la gauche Security Group, en bas: Inbound rules. rien de plus à faire ici c'était juste pour voir
+
+Session 144
+Création du RDS service (poster Relational Database Service):
+chercher service: RDS
+Create Database PostgresSQL instance, cliquer en bas le free usage
+Master username: comme dans le docker compose
+db instance identifier: multi-docker-postgres
+master username: postgres
+password: postgres_password
+assigner dans le VPC
+public access: no (on ne vuet pas que qqn de l'exterieur viennent ici)
+create new vpc ticked (on le changera après)
+database name: fibvalues
+
+Session 145:
+Création de ElastiCache service
+Depuis serviec, chercher ElastiCache
+Name: multi-docker-redis
+
+!!!!!!! Node type: cache t2 micro 0.5GiB
+number of replicas: none
+Subnet: name: redis-group
+VPC ID: selcectionner notre default VPC
+Subnets: ticker chaque checkbox
+clcik Create
+
+Session 146 Security Group
+Select service: VPC, section à gauche: security groups
+Create Security Group
+name: multi-docker
+description: Traffic for services in multi-docker app
+default VPC doit etre selected
+Click create
+
+Ticker le security group, inbound tab, edit, POrt: 5432-6379, source: select le security gorup qu'on edit en ce moment
+on va l'assigner aux services:
+
+Session 147:
+Service: ElastiCache
+Redis à gauche
+Select checkbox, modify, change VPC security group, ajouter multi-docker
+
+Servie RDS
+Instances à gauche, select instance, scroll down, Details section, modify, ajouter le security group multi-docker, hit continue
+
+
+EB:
+service: elastic beanstalk, configuraton à gauche, instances,,  modify, scrooldown, EC2 security group click checkbox
+
+Session 148:EB instace, configuration, software, scroll down:
+REDIS_HOST: aller sur l'instance elasticache, redis, expand, primary endpoint à copier à part le ":6379"
+REIS_PORT: 6379
+PGUSER: postgres
+PGPASSWORD: postgres_password
+PGHOST: RDS instance,instances, database instance, bottom in connect: endpoint
+PGDATABASE: fibvalues (nom de la DB)
+PGPORT: 5432
+
+Ces variables d'environnement profitent à tous les services listés dans le Dockerrunn.aws.json
+
+pousser le code sur github
+
