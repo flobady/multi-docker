@@ -1,8 +1,5 @@
 
 todo:
-supprimer les .git
-linker au depo
-repousser
 checker travis
 
 finir vidéo sur nginx
