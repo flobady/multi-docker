@@ -22,16 +22,16 @@ after_success:
   - docker push flobady/multi-worker
 
 
-# deploy:
-#   provider: elasticbeanstalk
-#   region: // en fonction du subdomain de mon url
-#   app: mutli-docker
-#   env: MultiDocker-env
-#   bucket_name: // services s3 copier le bucket name
-#   bucket_path: docker-multi
-#   on:
-#     branch: master
-#   access_key_id: $AWS_ACCESS_KEY
-#   secret_access_key:
-#     secure: $AWS_SECRET_KEY
+deploy:
+  provider: elasticbeanstalk
+  region: us-east-2 # cf sur ElasticBeanstalk URL
+  app: multi-docker # cf sur ElasticBeanstalk
+  env: MultiDocker-env-1 # cf sur ElasticBeanstalk
+  bucket_name: elasticbeanstalk-us-east-2-948493793866 # // services s3 copier le bucket name
+  bucket_path: docker-multi
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key:
+    secure: "$AWS_SECRET_KEY"
 
